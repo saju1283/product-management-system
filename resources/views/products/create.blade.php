@@ -2,17 +2,13 @@
 
 @section('content')
 <div class="container mt-5">
-
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <a href="{{ url('/products') }}" class="btn btn-success">Product List</a>
-    </div>
     <div class="card">
         <div class="card-header bg-dark text-white">
             <h4>Create New Product</h4>
         </div>
         <div class="card-body">
             <!-- Form to create a new product -->
-            <form method="POST" action="{{ route('products.store') }}">
+            <form method="POST" action="{{ route('products.store') }}" enctype="multipart/form-data">
                 @csrf
 
                 <!-- Product ID -->
@@ -45,10 +41,10 @@
                     <input type="number" name="stock" id="stock" class="form-control" placeholder="Enter Product Stock">
                 </div>
 
-                <!-- Image URL -->
+                <!-- Image Upload -->
                 <div class="mb-3">
-                    <label for="image" class="form-label">Image URL</label>
-                    <input type="text" name="image" id="image" class="form-control" placeholder="Enter Image URL" required>
+                    <label for="image" class="form-label">Product Image</label>
+                    <input type="file" name="image" id="image" class="form-control" required>
                 </div>
 
                 <!-- Submit Button -->

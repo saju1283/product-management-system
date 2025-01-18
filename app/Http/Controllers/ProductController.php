@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Product;
+use Illuminate\Support\Facades\Storage;
 
 class ProductController extends Controller
 {
@@ -47,21 +48,29 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
-    // Validate the request
-    $validated = $request->validate([
-        'product_id' => 'required|unique:products',
-        'name' => 'required',
-        'description' => 'nullable|string',
-        'price' => 'required|numeric',
-        'stock' => 'nullable|integer',
-        'image' => 'required|string',
-    ]);
+        // Validate the input
+        $validated = $request->validate([
+            'product_id' => 'required|unique:products',
+            'name' => 'required',
+            'description' => 'nullable|string',
+            'price' => 'required|numeric',
+            'stock' => 'nullable|integer',
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048', // Validate image
+        ]);
 
-    // Create a new product
-    Product::create($validated);
+        // Handle the image upload
+        if ($request->hasFile('image')) {
+            $file = $request->file('image');
+            $imagePath = $file->store('uploads', 'public'); // Store in 'public/uploads'
+            $validated['image'] = $imagePath;
+        }
 
-    // Redirect back to the product list with a success message
-    return redirect()->route('products.index')->with('success', 'Product created successfully!');
+        // Create the product
+        Product::create($validated);
+
+        // Redirect back to the product index page with a success message
+        return redirect()->route('products.index')->with('success', 'Product created successfully!');
+        
     }
 
     /**
@@ -87,23 +96,43 @@ class ProductController extends Controller
      */
     public function update(Request $request, $id)
     {
-        // Validate the form data
-        $validated = $request->validate([
-            'product_id' => 'required|unique:products,product_id,' . $id,
-            'name' => 'required',
-            'description' => 'nullable|string',
-            'price' => 'required|numeric',
-            'stock' => 'nullable|integer',
-            'image' => 'required|string',
-        ]);
+    // Validate the input
+    $validated = $request->validate([
+        'product_id' => 'required|unique:products,product_id,' . $id,
+        'name' => 'required',
+        'description' => 'nullable|string',
+        'price' => 'required|numeric',
+        'stock' => 'nullable|integer',
+        'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // Validate image
+    ]);
 
-        // Find the product and update it
-        $product = Product::findOrFail($id);
-        $product->update($validated);
+    // Find the product
+    $product = Product::findOrFail($id);
 
-        // Redirect back to the product index page with a success message
-        return redirect()->route('products.index')->with('success', 'Product updated successfully!');     
+    // Handle the new image upload
+    if ($request->hasFile('image')) {
+        // Delete the old image from storage
+        if ($product->image && Storage::exists('public/' . $product->image)) {
+            Storage::delete('public/' . $product->image);
+        }
+        
+
+        // Store the new image
+        $file = $request->file('image');
+        $imagePath = $file->store('uploads', 'public');
+        $validated['image'] = $imagePath; // Update the image path
+    } else {
+        // Keep the existing image if no new image is uploaded
+        $validated['image'] = $product->image;
     }
+
+    // Update the product
+    $product->update($validated);
+
+    // Redirect back to the product index page with a success message
+    return redirect()->route('products.index')->with('success', 'Product updated successfully!');
+}
+
 
 
     /**

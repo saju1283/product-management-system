@@ -2,7 +2,7 @@
 
 @section('content')
 <div class="container mt-5">
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="d-flex justify-content-between align-items-right mb-4">
         <a href="{{ route('products.create') }}" class="btn btn-success">+ Create New Product</a>
     </div>
 
@@ -36,7 +36,7 @@
                         <tr>
                             <td>{{ $index + 1 }}</td>
                             <td>
-                                <img src="{{ $product->image }}" alt="Product Image" class="img-thumbnail" style="width: 60px; height: 60px;">
+                                <img src="{{ asset('storage/' . $product->image) }}" alt="Product Image" class="img-thumbnail" style="width: 60px; height: 60px;">
                             </td>
                             <td>{{ $product->product_id }}</td>
                             <td>{{ $product->name }}</td>

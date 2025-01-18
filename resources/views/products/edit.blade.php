@@ -7,8 +7,7 @@
             <h4>Edit Product</h4>
         </div>
         <div class="card-body">
-            <!-- Form to edit an existing product -->
-            <form method="POST" action="{{ route('products.update', $product->id) }}">
+            <form method="POST" action="{{ route('products.update', $product->id) }}" enctype="multipart/form-data">
                 @csrf
                 @method('PUT')
 
@@ -42,10 +41,19 @@
                     <input type="number" name="stock" id="stock" class="form-control" value="{{ $product->stock }}">
                 </div>
 
-                <!-- Image URL -->
+                <!-- Current Image -->
                 <div class="mb-3">
-                    <label for="image" class="form-label">Image URL</label>
-                    <input type="text" name="image" id="image" class="form-control" value="{{ $product->image }}" required>
+                    <label for="current_image" class="form-label">Current Image</label>
+                    <div>
+                        <img src="{{ asset('storage/' . $product->image) }}" alt="Product Image" class="img-thumbnail" style="width: 120px; height: 120px;">
+                    </div>
+                </div>
+
+                <!-- New Image Upload -->
+                <div class="mb-3">
+                    <label for="image" class="form-label">New Product Image</label>
+                    <input type="file" name="image" id="image" class="form-control">
+                    <small class="text-muted">Leave blank if you don't want to change the image.</small>
                 </div>
 
                 <!-- Submit Button -->
